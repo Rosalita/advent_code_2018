@@ -63,6 +63,12 @@ func main() {
 	result := countInches(fabric)
 	fmt.Printf("result is: %d\n", result)
 
+	for i, claim := range input {
+		if checkHasNoOverlap(fabric, claim) {
+			fmt.Printf("claim %d has no overlap\n", i+1)
+		}
+	}
+
 }
 
 func splitToInt(str string, sep string) (a int, b int) {
@@ -79,6 +85,18 @@ func addClaim(fabric [][]int, c claim) [][]int {
 		}
 	}
 	return fabric
+}
+
+func checkHasNoOverlap(fabric [][]int, c claim) bool {
+	for i := 0; i < c.width; i++ {
+		for j := 0; j < c.height; j++ {
+			if fabric[i+c.x][j+c.y] != 1 {
+				return false
+			}
+		}
+	}
+
+	return true
 }
 
 func countInches(fabric [][]int) int {
