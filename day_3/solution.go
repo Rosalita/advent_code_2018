@@ -18,22 +18,22 @@ func getInput() []claim {
 
 	claims := []claim{}
 
-	input, err := ioutil.ReadFile("small_input.txt")
+	input, err := ioutil.ReadFile("input.txt")
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	datastr := string(input)
-	inputSlice := strings.Split(datastr, "\n")
+	inputRows := strings.Split(datastr, "\n")
 
-	for i := range inputSlice {
-		splitString := strings.Split(inputSlice[i], "@")
+	for i := range inputRows {
+		splitString := strings.Split(inputRows[i], "@")
 		noID := strings.TrimSpace(splitString[1])
 		coordAndSize := strings.Split(noID, ":")
 		coord := coordAndSize[0]
 		size := strings.TrimSpace(coordAndSize[1])
-		y, x := splitToInt(coord, ",")
+		x, y := splitToInt(coord, ",")
 		w, h := splitToInt(size, "x")
 
 		claim := claim{
@@ -44,30 +44,24 @@ func getInput() []claim {
 		}
 
 		claims = append(claims, claim)
-
 	}
-
 	return claims
 }
 
 func main() {
 	input := getInput()
 
-	fabric := make([][]int, 8)
+	fabric := make([][]int, 1000)
 	for i := range fabric {
-		fabric[i] = make([]int, 8)
+		fabric[i] = make([]int, 1000)
 	}
 
 	for _, claim := range input {
 		addClaim(fabric, claim)
 	}
 
-	for _, row := range fabric{
-		fmt.Println(row)
-	}
-
 	result := countInches(fabric)
-	fmt.Printf("result is: %d\n",result)
+	fmt.Printf("result is: %d\n", result)
 
 }
 
@@ -88,9 +82,7 @@ func addClaim(fabric [][]int, c claim) [][]int {
 }
 
 func countInches(fabric [][]int) int {
-
 	count := 0
-
 	for _, row := range fabric {
 		for _, value := range row {
 			if value > 1 {
@@ -98,6 +90,5 @@ func countInches(fabric [][]int) int {
 			}
 		}
 	}
-
 	return count
 }
