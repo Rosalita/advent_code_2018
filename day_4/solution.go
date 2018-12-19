@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"strings"
 	"sort"
+	"strings"
+	"strconv"
 )
 
-
 func getInput() []string {
-
 
 	input, err := ioutil.ReadFile("small_input.txt")
 
@@ -27,30 +26,87 @@ func main() {
 	input := getInput()
 	sort.Strings(input)
 
-	shifts := [][]string{}
-	shift := []string{}
+	shifts := splitIntoShifts(input)
+	fmt.Println(shifts)
 
-	for _, row := range input{
+	//guardsSleepingMins := map[string]int{}
+	
 
-		splitstring := strings.Split(row, " ")
-		minutes := row[15:17]
-		if strings.Contains(row, "Guard"){
-			shifts = append(shifts, shift)
-			shift = []string{}
-			shift = append(shift, splitstring[3])
-		}
+	for _, shift := range shifts{
+				//"#971", "asleep15", "wakes54",
 
-		if strings.Contains(row, "asleep"){
-			shift = append(shift, "asleep" + minutes)
+		guard := ""
+		minutes := 0
+		sleepAt := 0
+		wokeAt := 0
+
+		for i, event := range shift{
+
+			if i == 0{
+				guard = event
+				continue
+			}
+
+			if i % 2 == 0 { // if even index event
+				mins:= event[len(event)-2:]
+				sleepAt, _ = strconv.Atoi(mins)
+			}
+			if i % 2 == 1{ // if odd index event
+				mins := event[len(event)-2:]
+				wokeAt, _ = strconv.Atoi(mins)
+
+				timeAsleep := wokeAt - sleepAt
+				minutes += timeAsleep
+			}
 		}
-		if strings.Contains(row, "wakes"){
-			shift = append(shift, "wakes" + minutes)
-		}
+	
+		fmt.Println(guard)
+		fmt.Println(minutes)
+		//"#971", "asleep15", "wakes54",
+		//"#3079", "asleep08", "wakes48", "asleep51", "wakes52",
+
 
 	}
 
-	fmt.Printf("%+v\n", shifts)
+}
 
-	
+func splitIntoShifts(input []string) [][]string {
+	shifts := [][]string{}
+	shift := []string{}
 
+	for i, row := range input {
+
+		minutes := row[15:17]
+
+		if i == 0 {
+			splitstring := strings.Split(row, " ")
+			shift = append(shift, splitstring[3])
+			continue
+		}
+
+		if i == (len(input) - 1) {
+			if strings.Contains(row, "asleep") {
+				shift = append(shift, "asleep"+minutes)
+			} else {
+				shift = append(shift, "wakes"+minutes)
+			}
+			shifts = append(shifts, shift)
+		}
+
+		if strings.Contains(row, "Guard") {
+			shifts = append(shifts, shift)
+			shift = []string{}
+			splitstring := strings.Split(row, " ")
+			shift = append(shift, splitstring[3])
+
+		} else {
+			if strings.Contains(row, "asleep") {
+				shift = append(shift, "asleep"+minutes)
+			} else {
+				shift = append(shift, "wakes"+minutes)
+			}
+		}
+	}
+
+	return shifts
 }
