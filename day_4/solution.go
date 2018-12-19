@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"sort"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func getInput() []string {
 
-	input, err := ioutil.ReadFile("small_input.txt")
+	input, err := ioutil.ReadFile("input.txt")
 
 	if err != nil {
 		fmt.Println(err)
@@ -27,31 +27,27 @@ func main() {
 	sort.Strings(input)
 
 	shifts := splitIntoShifts(input)
-	fmt.Println(shifts)
+	guardsSleepingMins := map[string]int{}
 
-	//guardsSleepingMins := map[string]int{}
-	
-
-	for _, shift := range shifts{
-				//"#971", "asleep15", "wakes54",
+	for _, shift := range shifts {
 
 		guard := ""
 		minutes := 0
 		sleepAt := 0
 		wokeAt := 0
 
-		for i, event := range shift{
+		for i, event := range shift {
 
-			if i == 0{
+			if i == 0 {
 				guard = event
 				continue
 			}
 
-			if i % 2 == 0 { // if even index event
-				mins:= event[len(event)-2:]
+			if i%2 == 1 { // if odd index event
+				mins := event[len(event)-2:]
 				sleepAt, _ = strconv.Atoi(mins)
 			}
-			if i % 2 == 1{ // if odd index event
+			if i%2 == 0 { // if even index event
 				mins := event[len(event)-2:]
 				wokeAt, _ = strconv.Atoi(mins)
 
@@ -59,15 +55,97 @@ func main() {
 				minutes += timeAsleep
 			}
 		}
-	
-		fmt.Println(guard)
-		fmt.Println(minutes)
-		//"#971", "asleep15", "wakes54",
-		//"#3079", "asleep08", "wakes48", "asleep51", "wakes52",
-
+		guardsSleepingMins[guard] += minutes
 
 	}
 
+	guardNumber, max := max(guardsSleepingMins)
+
+	fmt.Printf("The guard that has slept the most minutes is %s %d\n", guardNumber, max)
+
+	sleepiestGuardShifts := [][]string{}
+
+	for _, shift := range shifts {
+
+		if shift[0] == "#971" {
+			sleepiestGuardShifts = append(sleepiestGuardShifts, shift)
+		}
+
+	}
+
+	fmt.Println(sleepiestGuardShifts)
+	SleepFreq := map[int]int{}
+
+	for _, shift := range sleepiestGuardShifts {
+
+		sleepAt := 0
+		wokeAt := 0
+
+		fmt.Println(sleepAt)
+		fmt.Println(wokeAt)
+
+		for i, event := range shift {
+
+			if i == 0 {
+				continue
+			}
+
+			if i%2 == 1 { // if odd index event
+				mins := event[len(event)-2:]
+				sleepAt, _ = strconv.Atoi(mins)
+			}
+			if i%2 == 0 { // if even index event
+				mins := event[len(event)-2:]
+				wokeAt, _ = strconv.Atoi(mins)
+
+				for j := sleepAt; j <= wokeAt; j++ {
+					SleepFreq[j] ++
+				}
+			}
+		}
+
+	}
+
+	fmt.Println(SleepFreq)
+
+	minuteNum, max := maxInt(SleepFreq)
+
+	fmt.Printf("the guard spent minute %d asleep for %d minutes in total\n", minuteNum, max)
+
+}
+
+func max(results map[string]int) (string, int) {
+	var max int
+	var guardNumber string
+	for guard, minutes := range results {
+		max = minutes
+		guardNumber = guard
+		break
+	}
+	for guard, minutes := range results {
+		if minutes > max {
+			max = minutes
+			guardNumber = guard
+		}
+	}
+	return guardNumber, max
+}
+
+func maxInt(results map[int]int) (int, int) {
+	var max int
+	var minuteNum int
+	for minuteNumber, freq := range results {
+		max = freq
+		minuteNum = minuteNumber
+		break
+	}
+	for minuteNumber, freq := range results {
+		if freq > max {
+			max = freq
+			minuteNum = minuteNumber
+		}
+	}
+	return minuteNum, max
 }
 
 func splitIntoShifts(input []string) [][]string {
