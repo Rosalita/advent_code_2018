@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 )
 
 func getInput() string {
 
-	input, err := ioutil.ReadFile("small_input.txt")
+	input, err := ioutil.ReadFile("input.txt")
 
 	if err != nil {
 		fmt.Println(err)
@@ -19,15 +20,36 @@ func getInput() string {
 func main() {
 
 	input := getInput()
-	fmt.Println(input)
 
-	for _, char := range input {
-		fmt.Printf("%v %v\n",char, string(char))
+	result, done := reduce(input)
 
-		// a = 97 (-32 = A)
-		// A = 65 (+ 32 = a) 
-
-		// val1, val2 = val1 - val2 == 32 or -32
-		// make new slice without those two values
+	for !done {
+		result, done = reduce(result)
 	}
+	
+	fmt.Printf("result is : %s\n", result)
+	fmt.Printf("%d units remain\n", len(result))
+}
+
+
+func reduce(input string)(result string, done bool){
+
+	for i := range input {
+		if i == 0 {
+			continue
+		}
+
+		difference := float64(input[i-1]) - float64(input[i])
+		absDifference := math.Abs(difference)
+
+		if absDifference == 32{
+			firstHalfString := input[:i-1]
+			secondHalfString := input[i+1:]
+
+			returnString := firstHalfString + secondHalfString
+			return returnString, false
+		}
+	}
+
+	return input, true
 }
