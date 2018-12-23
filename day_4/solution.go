@@ -67,7 +67,7 @@ func main() {
 
 	for _, shift := range shifts {
 
-		if shift[0] == "#971" {
+		if shift[0] == guardNumber {
 			sleepiestGuardShifts = append(sleepiestGuardShifts, shift)
 		}
 
@@ -81,8 +81,7 @@ func main() {
 		sleepAt := 0
 		wokeAt := 0
 
-		fmt.Println(sleepAt)
-		fmt.Println(wokeAt)
+
 
 		for i, event := range shift {
 
@@ -93,12 +92,15 @@ func main() {
 			if i%2 == 1 { // if odd index event
 				mins := event[len(event)-2:]
 				sleepAt, _ = strconv.Atoi(mins)
+				fmt.Printf("asleep at %d\n", sleepAt)
 			}
 			if i%2 == 0 { // if even index event
 				mins := event[len(event)-2:]
 				wokeAt, _ = strconv.Atoi(mins)
+				fmt.Printf("woke at %d\n", wokeAt)
 
-				for j := sleepAt; j <= wokeAt; j++ {
+
+				for j := sleepAt; j < wokeAt; j++ {
 					SleepFreq[j] ++
 				}
 			}
@@ -111,6 +113,8 @@ func main() {
 	minuteNum, max := maxInt(SleepFreq)
 
 	fmt.Printf("the guard spent minute %d asleep for %d minutes in total\n", minuteNum, max)
+
+	fmt.Println(971 * 38)
 
 }
 
